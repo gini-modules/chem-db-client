@@ -1,0 +1,11 @@
+{
+    "id": "chem-db-client",
+    "name": "chem-db-client",
+    "description": "ChemDB CLIENT",
+    "version": "0.1.0",
+    "dependencies": {
+        "gini": "*",
+        "cache": "*"
+    }
+}
+
