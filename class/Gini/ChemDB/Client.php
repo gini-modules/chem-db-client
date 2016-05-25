@@ -18,7 +18,7 @@ class Client
 
     public static function getChemicalInfo($casNO)
     {
-        $cacheKey = "chemdb#{$casNO}#chemical#info";
+        $cacheKey = "chemical[{$casNO}]";
         $info = self::cache($cacheKey);
         if ($info) return $info;
         
@@ -30,23 +30,33 @@ class Client
 
     public static function getProduct($casNO)
     {
-        $cacheKey = "chemdb#{$casNO}#product#info";
-        $info = self::cache($cacheKey);
-        if ($info) return $info;
+        $info = self::getChemicalInfo($casNO);
+        if (!$info) return;
 
-        $info = self::getRPC()->product->chem->getProduct($casNO);
-        self::cache($cacheKey, $info);
+        $types = (array)$info['types'];
+        if (empty($types)) return;
 
-        return $info;
+        $data = [];
+        foreach ($types as $type) {
+            $data[$type] = [
+                'cas_no'=> $info['cas_no'],
+                'name'=> $info['name'],
+                'type'=> $type,
+                'state'=> $info['state'],
+                'type_title'=> $info['titles'][$type]
+            ];
+        }
+
+        return $data;
     }
 
     public static function getOneTypes($casNO)
     {
-        $cacheKey = "chemdb#{$casNO}#types";
+        $cacheKey = "chemical[{$casNO}]types";
         $data = self::cache($cacheKey);
         if (is_array($data)) return $data;
 
-        $data = self::getRPC()->product->chem->getTypes($casNO);
+        $data = self::getRPC()->chemDB->getChemicalTypes($casNO);
         if (is_array($data)) {
             self::cache($cacheKey, $data);
         }
@@ -61,7 +71,7 @@ class Client
         $data = [];
         $needFetches = [];
         foreach ($casNOs as $casNO) {
-            $cacheKey = "chemdb#{$casNO}#types";
+            $cacheKey = "chemical[{$casNO}]types";
             $type = self::cache($cacheKey);
             if (!is_array($type)) {
                 $needFetches[] = $casNO;
@@ -71,9 +81,10 @@ class Client
         }
 
         if (!empty($needFetches)) {
-            $types = (array)self::getRPC()->product->chem->getTypes($needFetches);
+            $types = (array)self::getRPC()->chemDB->getChemicalTypes($needFetches);
             foreach ($types as $k=>$ts) {
-                $cacheKey = "chemdb#{$k}#types";
+                if (!is_array($ts)) continue;
+                $cacheKey = "chemical[{$k}]types";
                 self::cache($cacheKey, $ts);
                 $data[$k] = $ts;
             }
