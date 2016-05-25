@@ -5,7 +5,7 @@ namespace Gini\ChemDB;
 class Client
 {
     private static $_chemDBRPC;
-    private static $_cacheTime = 86400;
+    public static $cacheTimeout = 86400;
     public static function getRPC()
     {
         if (self::$_chemDBRPC) return self::$_chemDBRPC;
@@ -95,10 +95,10 @@ class Client
 
     private static function cache($key, $value=null)
     {
-        $cacher = \Gini\Cache::of('gapper');
+        $cacher = \Gini\Cache::of('chemdb');
         if (is_null($value)) {
             return $cacher->get($key);
         }
-        $cacher->set($key, $value, self::$_cacheTime ?: 60);
+        $cacher->set($key, $value, self::$cacheTimeout ?: 60);
     }
 }
