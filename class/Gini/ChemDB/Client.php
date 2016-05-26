@@ -77,7 +77,7 @@ class Client
                 $needFetches[] = $casNO;
                 continue;
             }
-            $data = array_merge($data, [$casNO=> $type]);
+            $data = array_merge($data, $type);
         }
 
         if (!empty($needFetches)) {
@@ -85,7 +85,7 @@ class Client
             foreach ($types as $k=>$ts) {
                 if (!is_array($ts)) continue;
                 $cacheKey = "chemical[{$k}]types";
-                self::cache($cacheKey, $ts);
+                self::cache($cacheKey, [$k=>$ts]);
                 $data[$k] = $ts;
             }
         }
