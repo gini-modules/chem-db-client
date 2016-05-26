@@ -77,7 +77,7 @@ class Client
                 $needFetches[] = $casNO;
                 continue;
             }
-            $data = array_merge($data, $type);
+            $data = array_merge($data, [$casNO=> $type]);
         }
 
         if (!empty($needFetches)) {
