@@ -2,7 +2,7 @@
     "id": "chem-db-client",
     "name": "chem-db-client",
     "description": "ChemDB CLIENT",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "dependencies": {
         "gini": "*",
         "cache": "*"
