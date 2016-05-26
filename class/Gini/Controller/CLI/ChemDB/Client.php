@@ -10,18 +10,22 @@ class Client extends \Gini\Controller\CLI
 
         $data = $rpc->chemDB->searchChemicals([]);
         $token = $data['token'];
-        if (!$token) return;
+        if (!$token) {
+            return;
+        }
 
         $start = 0;
         $perpage = 20;
         $cacher = \Gini\Cache::of('chemdb');
         while (true) {
             $data = $rpc->chemDB->getChemicals($token, $start, $perpage);
-            if (!count($data)) break;
+            if (!count($data)) {
+                break;
+            }
             $start += $perpage;
-            foreach ($data as $casNO=>$chemical) {
+            foreach ($data as $casNO => $chemical) {
                 $cacheKey = "chemical[{$casNO}]";
-                $cacher->set($cacheKey, $chemical, \Gini\ChemDB\Client::$cacheTimeout?:60);
+                $cacher->set($cacheKey, $chemical, \Gini\ChemDB\Client::$cacheTimeout ?: 60);
             }
         }
     }

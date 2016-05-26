@@ -8,11 +8,14 @@ class Client
     public static $cacheTimeout = 86400;
     public static function getRPC()
     {
-        if (self::$_chemDBRPC) return self::$_chemDBRPC;
+        if (self::$_chemDBRPC) {
+            return self::$_chemDBRPC;
+        }
         $conf = \Gini\Config::get('chem-db.rpc');
         $url = $conf['url'];
         $rpc = \Gini\IoC::construct('\Gini\RPC', $url);
         self::$_chemDBRPC = $rpc;
+
         return $rpc;
     }
 
@@ -20,30 +23,50 @@ class Client
     {
         $cacheKey = "chemical[{$casNO}]";
         $info = self::cache($cacheKey);
-        if ($info) return $info;
-        
+        if ($info) {
+            return $info;
+        }
+
         $info = self::getRPC()->chemdb->getChemical($casNO);
         self::cache($cacheKey, $info);
 
         return $info;
     }
 
+    public static function getMSDS($casNO)
+    {
+        $cacheKey = "msds[{$casNO}]";
+        $msds = self::cache($cacheKey);
+        if ($msds) {
+            return $msds;
+        }
+
+        $msds = self::getRPC()->ChemDB->getMSDS($casNO);
+        self::cache($cacheKey, $msds);
+
+        return $msds;
+    }
+
     public static function getProduct($casNO)
     {
         $info = self::getChemicalInfo($casNO);
-        if (!$info) return;
+        if (!$info) {
+            return;
+        }
 
-        $types = (array)$info['types'];
-        if (empty($types)) return;
+        $types = (array) $info['types'];
+        if (empty($types)) {
+            return;
+        }
 
         $data = [];
         foreach ($types as $type) {
             $data[$type] = [
-                'cas_no'=> $info['cas_no'],
-                'name'=> $info['name'],
-                'type'=> $type,
-                'state'=> $info['state'],
-                'type_title'=> $info['titles'][$type]
+                'cas_no' => $info['cas_no'],
+                'name' => $info['name'],
+                'type' => $type,
+                'state' => $info['state'],
+                'type_title' => $info['titles'][$type],
             ];
         }
 
@@ -54,7 +77,9 @@ class Client
     {
         $cacheKey = "chemical[{$casNO}]types";
         $data = self::cache($cacheKey);
-        if (is_array($data)) return $data;
+        if (is_array($data)) {
+            return $data;
+        }
 
         $data = self::getRPC()->chemDB->getChemicalTypes($casNO);
         if (is_array($data)) {
@@ -66,7 +91,9 @@ class Client
 
     public static function getTypes($casNOs)
     {
-        if (!is_array($casNOs)) return self::getOneTypes($casNOs);
+        if (!is_array($casNOs)) {
+            return self::getOneTypes($casNOs);
+        }
 
         $data = [];
         $needFetches = [];
@@ -81,11 +108,13 @@ class Client
         }
 
         if (!empty($needFetches)) {
-            $types = (array)self::getRPC()->chemDB->getChemicalTypes($needFetches);
-            foreach ($types as $k=>$ts) {
-                if (!is_array($ts)) continue;
+            $types = (array) self::getRPC()->chemDB->getChemicalTypes($needFetches);
+            foreach ($types as $k => $ts) {
+                if (!is_array($ts)) {
+                    continue;
+                }
                 $cacheKey = "chemical[{$k}]types";
-                self::cache($cacheKey, [$k=>$ts]);
+                self::cache($cacheKey, [$k => $ts]);
                 $data[$k] = $ts;
             }
         }
@@ -93,7 +122,7 @@ class Client
         return $data;
     }
 
-    private static function cache($key, $value=null)
+    private static function cache($key, $value = null)
     {
         $cacher = \Gini\Cache::of('chemdb');
         if (is_null($value)) {
