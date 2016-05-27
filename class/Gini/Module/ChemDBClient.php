@@ -20,6 +20,8 @@ class ChemDBClient
 
         $errors[] = "请确保cron.yml配置了定时刷新的命令\n\t\tchem-db-client:\n\t\t\tinterval: '* */4 * * *'\n\t\t\tcommand: chemdb client refreshallcache\n\t\t\tcomment: 定时将刷新chemdb的redis缓存";
 
-        if (!empty($errors)) return $errors;
+        if (!empty($errors)) {
+            return $errors;
+        }
     }
 }
