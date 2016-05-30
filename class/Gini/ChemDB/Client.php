@@ -80,22 +80,15 @@ class Client
 
     public static function getOneTypes($casNO)
     {
-        $cacheKey = "chemical[{$casNO}]types";
-        $data = self::cache($cacheKey);
-        if (is_array($data)) {
-            return $data;
-        }
+        $info = self::getChemicalInfo($casNO);
+        if (empty($info)) return [];
 
-        if (self::cache(self::$fullCacheKey)) {
-            return [];
-        }
+        $types = $info['types'];
+        if (empty($types)) return [];
 
-        $data = self::getRPC()->chemDB->getChemicalTypes($casNO);
-        if (is_array($data)) {
-            self::cache($cacheKey, $data);
-        }
-
-        return $data;
+        return [
+            $casNO=> $types
+        ];
     }
 
     public static function getTypes($casNOs)
@@ -105,27 +98,9 @@ class Client
         }
 
         $data = [];
-        $needFetches = [];
         foreach ($casNOs as $casNO) {
-            $cacheKey = "chemical[{$casNO}]types";
-            $type = self::cache($cacheKey);
-            if (!is_array($type) && !self::cache(self::$fullCacheKey)) {
-                $needFetches[] = $casNO;
-                continue;
-            }
+            $type = self::getOneTypes($casNO);
             $data = array_merge($data, $type);
-        }
-
-        if (!empty($needFetches)) {
-            $types = (array) self::getRPC()->chemDB->getChemicalTypes($needFetches);
-            foreach ($types as $k => $ts) {
-                if (!is_array($ts)) {
-                    continue;
-                }
-                $cacheKey = "chemical[{$k}]types";
-                self::cache($cacheKey, [$k => $ts]);
-                $data[$k] = $ts;
-            }
         }
 
         return $data;
