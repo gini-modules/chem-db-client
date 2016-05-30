@@ -6,6 +6,7 @@ class Client
 {
     private static $_chemDBRPC;
     public static $cacheTimeout = 86400;
+    public static $fullCacheKey = 'chemical[allcached]';
     public static function getRPC()
     {
         if (self::$_chemDBRPC) {
@@ -25,6 +26,10 @@ class Client
         $info = self::cache($cacheKey);
         if ($info) {
             return $info;
+        }
+
+        if (self::cache(self::$fullCacheKey)) {
+            return [];
         }
 
         $info = self::getRPC()->chemdb->getChemical($casNO);
@@ -81,6 +86,10 @@ class Client
             return $data;
         }
 
+        if (self::cache(self::$fullCacheKey)) {
+            return [];
+        }
+
         $data = self::getRPC()->chemDB->getChemicalTypes($casNO);
         if (is_array($data)) {
             self::cache($cacheKey, $data);
@@ -100,7 +109,7 @@ class Client
         foreach ($casNOs as $casNO) {
             $cacheKey = "chemical[{$casNO}]types";
             $type = self::cache($cacheKey);
-            if (!is_array($type)) {
+            if (!is_array($type) && !self::cache(self::$fullCacheKey)) {
                 $needFetches[] = $casNO;
                 continue;
             }
