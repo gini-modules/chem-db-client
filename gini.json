@@ -4,7 +4,7 @@
     "description": "ChemDB CLIENT",
     "version": "0.1.6",
     "dependencies": {
-        "gini": "*",
+        "gini": ">=1.5.4",
         "cache": "*"
     }
 }

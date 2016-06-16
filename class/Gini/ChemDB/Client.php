@@ -4,20 +4,11 @@ namespace Gini\ChemDB;
 
 class Client
 {
-    private static $_chemDBRPC;
     public static $cacheTimeout = 86400;
     public static $fullCacheKey = 'chemical[allcached]';
     public static function getRPC()
     {
-        if (self::$_chemDBRPC) {
-            return self::$_chemDBRPC;
-        }
-        $conf = \Gini\Config::get('chem-db.rpc');
-        $url = $conf['url'];
-        $rpc = \Gini\IoC::construct('\Gini\RPC', $url);
-        self::$_chemDBRPC = $rpc;
-
-        return $rpc;
+        return \Gini\RPC::of('chemdb');
     }
 
     public static function getChemicalInfo($casNO)
@@ -32,7 +23,7 @@ class Client
             return [];
         }
 
-        $info = self::getRPC()->chemdb->getChemical($casNO);
+        $info = self::getRPC()->ChemDB->getChemical($casNO);
         self::cache($cacheKey, $info);
 
         return $info;
