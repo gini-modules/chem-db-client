@@ -1,0 +1,5 @@
+---
+rpc:
+  chemdb:
+    url: http://chem-db.labmai.com/api
+...
