@@ -6,6 +6,12 @@ class Client
 {
     public static $cacheTimeout = 86400;
     public static $fullCacheKey = 'chemical[allcached]';
+    public static $titles = [
+        'drug_precursor' => '易制毒',
+        'hazardous' => '危险品',
+        'highly_toxic' => '剧毒品',
+        'explosive' => '易制爆'
+    ];
     public static function getRPC()
     {
         return \Gini\RPC::of('chemdb');
@@ -56,13 +62,14 @@ class Client
         }
 
         $data = [];
+        $titles = self::$titles;
         foreach ($types as $type) {
             $data[$type] = [
                 'cas_no' => $info['cas_no'],
                 'name' => $info['name'],
                 'type' => $type,
                 'state' => $info['state'],
-                'type_title' => $info['titles'][$type],
+                'type_title' => $titles[$type]?:$type,
             ];
         }
 
