@@ -49,33 +49,6 @@ class Client
         return $msds;
     }
 
-    public static function getProduct($casNO)
-    {
-        $info = self::getChemicalInfo($casNO);
-        if (!$info) {
-            return;
-        }
-
-        $types = (array) $info['types'];
-        if (empty($types)) {
-            return;
-        }
-
-        $data = [];
-        $titles = self::$titles;
-        foreach ($types as $type) {
-            $data[$type] = [
-                'cas_no' => $info['cas_no'],
-                'name' => $info['name'],
-                'type' => $type,
-                'state' => $info['state'],
-                'type_title' => $titles[$type]?:$type,
-            ];
-        }
-
-        return $data;
-    }
-
     public static function getOneTypes($casNO)
     {
         $info = self::getChemicalInfo($casNO);
