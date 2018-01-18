@@ -8,7 +8,11 @@ class Client extends \Gini\Controller\CLI
     {
         $rpc = \Gini\ChemDB\Client::getRPC();
 
-        $data = $rpc->chemDB->searchChemicals([]);
+        $data = $rpc->chemDB->searchChemicals([
+            'type'=> [
+                'hazardous', 'drug_precursor', 'highly_toxic', 'explosive', 'psychotropic', 'narcotic', 'gas'
+            ]
+        ]);
         $token = $data['token'];
         if (!$token) {
             return;
