@@ -2,9 +2,10 @@
     "id": "chem-db-client",
     "name": "chem-db-client",
     "description": "ChemDB CLIENT",
-    "version": "0.1.10",
+    "version": "0.1.11",
     "dependencies": {
         "gini": ">=1.5.4",
         "cache": "*"
-    }
+    },
+    "moduleClass": "\\Gini\\Module\\chemdbclient"
 }
