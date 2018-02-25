@@ -40,11 +40,12 @@ class Client
     {
         $cacheKey = "msds[{$casNO}]";
         $msds = self::cache($cacheKey);
-        if ($msds) {
+        if (is_array($msds)) {
             return $msds;
         }
 
         $msds = self::getRPC()->ChemDB->getMSDS($casNO);
+        if (!is_array($msds)) $msds = [];
         self::cache($cacheKey, $msds);
 
         return $msds;
