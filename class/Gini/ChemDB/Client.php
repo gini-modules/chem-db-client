@@ -21,7 +21,7 @@ class Client
     {
         $cacheKey = "chemical[{$casNO}]";
         $info = self::cache($cacheKey);
-        if ($info) {
+        if (is_array($info)) {
             return $info;
         }
 
@@ -30,6 +30,7 @@ class Client
         }
 
         $info = self::getRPC()->ChemDB->getChemical($casNO);
+        if (!is_array($info)) $info = [];
         self::cache($cacheKey, $info);
 
         return $info;

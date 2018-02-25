@@ -36,11 +36,13 @@ class Client extends \Gini\Controller\CLI
         }
         $myEnd = time();
 
+        /* // 增加这个full-cached的状态，是为了避免缓存穿透. 但是，扩容了chemdb的数据库之后，普通化学品也纳入管理范围，但是我们只是缓存了危化品。普通化学品就会无法获取
         $myDiff = max($myEnd - $myStart, 10);
 
         $cacheTimeout = max($cacheTimeout - $myDiff, 0);
         if ($cacheTimeout) {
             $cacher->set(\Gini\ChemDB\Client::$fullCacheKey, time(), $cacheTimeout);
         }
+         */
     }
 }
