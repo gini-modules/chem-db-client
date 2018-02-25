@@ -22,6 +22,7 @@ class Client extends \Gini\Controller\CLI
         $perpage = 20;
         $cacher = \Gini\Cache::of('chemdb');
         $cacheTimeout = \Gini\ChemDB\Client::$cacheTimeout ?: 60;
+        $myStart = time();
         while (true) {
             $data = $rpc->chemDB->getChemicals($token, $start, $perpage);
             if (!count($data)) {
@@ -33,8 +34,13 @@ class Client extends \Gini\Controller\CLI
                 $cacher->set($cacheKey, $chemical, $cacheTimeout);
             }
         }
+        $myEnd = time();
 
-        $cacheTimeout = max($cacheTimeout - 10, 20);
-        $cacher->set(\Gini\ChemDB\Client::$fullCacheKey, time(), $cacheTimeout);
+        $myDiff = max($myEnd - $myStart, 10);
+
+        $cacheTimeout = max($cacheTimeout - $myDiff, 0);
+        if ($cacheTimeout) {
+            $cacher->set(\Gini\ChemDB\Client::$fullCacheKey, time(), $cacheTimeout);
+        }
     }
 }
