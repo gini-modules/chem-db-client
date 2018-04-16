@@ -1,5 +1,5 @@
 ---
 rpc:
   chemdb:
-    url: ${CHEM_DB_RPC_URL:='http://chem-db.labmai.com/api'}
+    url: ${CHEMDB_API:='http://chem-db.labmai.com/api'}
 ...
