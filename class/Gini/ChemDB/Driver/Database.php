@@ -22,7 +22,7 @@ class Database
         $db = self::getDB();
         $qCasNOs = $db->quote($casNO);
         $keys = self::$_chemical_info_keys;
-        $keysString = $db->quoteIdent($keys);
+        $keysString = implode(',', $keys);
         $query = self::getDB()->query("select {$keysString} from chemical_info where cas_no={$qCasNOs}");
         if (!$query) return [];
         $row = $query->row(\PDO::FETCH_ASSOC);
