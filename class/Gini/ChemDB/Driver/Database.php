@@ -55,7 +55,7 @@ class Database
 
     public static function getTypes($casNOs)
     {
-        if (!is_array($casNOs)) return self::getOneTypes($casNos);
+        if (!is_array($casNOs)) return self::getOneTypes($casNOs);
 
         $db = self::getDB();
         $qCasNOs = $db->quote($casNOs);
