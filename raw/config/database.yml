@@ -1,0 +1,6 @@
+---
+chem-db-client-local-db:
+  dsn: mysql:dbname=${CHEM_DB_CLIENT_LOCAL_DB_NAME:=''};host=${CHEM_DB_CLIENT_LOCAL_DB_HOST:='172.17.0.1'};port=${CHEM_DB_CLIENT_LOCAL_DB_PORT:='3306'}
+  username: ${CHEM_DB_CLIENT_LOCAL_DB_USER:=''}
+  password: ${CHEM_DB_CLIENT_LOCAL_DB_PASS:=''}
+...

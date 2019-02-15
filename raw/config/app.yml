@@ -2,4 +2,6 @@
 rpc:
   chemdb:
     url: ${CHEMDB_API:='http://chem-db.labmai.com/api'}
+
+chemdbclient_driver: ${CHEM_DB_CLIENT_DRIVER:='rpc'}
 ...
