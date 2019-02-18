@@ -153,7 +153,7 @@ class Database
         $db = self::getDB();
         $query = $db->query($sql);
         if (!$query) return [];
-        $rows = $query->rows(\PDF::FETCH_ASSOC);
+        $rows = $query->rows(\PDO::FETCH_ASSOC);
 
         $result = [];
         foreach ($rows as $row) {
