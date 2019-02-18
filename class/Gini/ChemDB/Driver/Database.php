@@ -10,6 +10,12 @@ class Database
         return \Gini\Database::db('chem-db-client-local-db');
     }
 
+    // TODO 这个是临时的功能，getChemicals的功能完成之后，就可以移除该方法
+    public static function getRPC()
+    {
+        return \Gini\RPC::of('chemdb');
+    }
+
     // TODO 目前，所有的对chemical的搜索，都是有具体的功能逻辑实现的
     // 之后需要统一管理
     public static function getChemicals($criteria, $start=0, $limit=25)
