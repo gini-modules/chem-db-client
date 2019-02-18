@@ -158,6 +158,7 @@ class Database
         $result = [];
         foreach ($rows as $row) {
             $casNO = $row['cas_no'];
+            $qCasNOs = $db->quote($casNO);
             $result[$casNO] = array_merge($row, [
                 'types'=> (array) self::getOneTypes($casNO)[$casNO],
                 'msds'=> !!($db->query("select 1 from chemical_msds where cas_no={$qCasNOs}")->value())
