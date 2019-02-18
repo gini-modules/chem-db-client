@@ -12,12 +12,6 @@ class RPC
         return \Gini\RPC::of('chemdb');
     }
 
-    // TODO 目前，所有的对chemical的搜索，都是有具体的功能逻辑实现的
-    // 之后需要统一管理
-    public static function getChemicals($criteria, $start=0, $limit=25)
-    {
-    }
-
     public static function getChemicalInfo($casNO)
     {
         $cacheKey = "chemical[{$casNO}]";
