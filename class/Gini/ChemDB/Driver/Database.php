@@ -16,9 +16,11 @@ class Database
     {
     }
 
-	private static $_chemical_info_keys = ['cas_no', 'name', 'state', 'en_name', 'inchi', 'smiles', 'inchi_key'];
+    private static $_chemical_info_keys = ['cas_no', 'name', 'state', 'en_name', 'inchi', 'smiles', 'inchi_key'];
+    private static $_stash_cheminfo = [];
     public static function getChemicalInfo($casNO)
     {
+        if (isset(self::$_stash_cheminfo[$casNO])) return self::$_stash_cheminfo[$casNO];
         $db = self::getDB();
         $qCasNOs = $db->quote($casNO);
         $keys = self::$_chemical_info_keys;
@@ -28,29 +30,42 @@ class Database
         $row = $query->row(\PDO::FETCH_ASSOC);
         $row['types'] = (array) self::getOneTypes($casNO)[$casNO];
         $row['msds'] = !!($db->query("select 1 from chemical_msds where cas_no={$qCasNOs}")->value());
+        self::$_stash_cheminfo[$casNO] = $row;
         return $row;
     }
 
+    private static $_stash_msds = [];
     public static function getMSDS($casNO)
     {
+        if (isset(self::$_stash_msds[$casNO])) return self::$_stash_msds[$casNO];
         $db = self::getDB();
         $qCasNOs = $db->quote($casNO);
         $data = $db->query("select msds from chemical_msds where cas_no={$qCasNOs}")->value();
-        return $data ? json_decode($data, true) : [];
+        $data = $data ? json_decode($data, true) : [];
+        self::$_stash_msds[$casNO] = $data;
+        return $data;
     }
 
+    private static $_stash_onetypes = [];
     public static function getOneTypes($casNO)
     {
+        if (isset(self::$_stash_onetypes[$casNO])) return self::$_stash_onetypes[$casNO];
         $db = self::getDB();
         $qCasNOs = $db->quote($casNO);
         $query = self::getDB()->query("select group_concat(name) as names from chemical_type where cas_no={$qCasNOs} group by cas_no");
         if (!$query) return [];
 
         $names = $query->value();
-        if (!$names) return [];
+        if (!$names) {
+            $result = [];
+        } else {
+            $data = array_unique(explode(',', $names));
+            $result = [$casNO=> $data];
+        }
 
-        $data = array_unique(explode(',', $names));
-        return [$casNO=> $data];
+        self::$_stash_onetypes[$casNO] = $result;
+
+        return $result;
     }
 
     public static function getTypes($casNOs)
