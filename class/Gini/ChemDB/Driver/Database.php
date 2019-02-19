@@ -51,7 +51,7 @@ class Database
 
         $names = $query->value();
         if (!$names) {
-            $result = [];
+            $result = [$casNO=> ['normal']];
         } else {
             $data = array_unique(explode(',', $names));
             $result = [$casNO=> $data];
@@ -77,6 +77,11 @@ class Database
         $data = [];
         foreach ($rows as $row) {
             $data[$row->cas_no] = array_unique(explode(',', $row->names));
+        }
+        foreach ($casNOs as $casNO) {
+            if (!isset($data[$casNO])) {
+                $data[$casNO] = ['normal'];
+            }
         }
 
         return $data;
