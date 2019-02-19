@@ -22,7 +22,7 @@ class Database
         $query = self::getDB()->query("select {$keysString} from chemical_info where cas_no={$qCasNOs}");
         if (!$query) return [];
         $row = $query->row(\PDO::FETCH_ASSOC);
-        $row['types'] = (array) self::getOneTypes($casNO)[$casNO];
+        $row['types'] = self::getOneTypes($casNO)[$casNO];
         $row['msds'] = !!($db->query("select 1 from chemical_msds where cas_no={$qCasNOs}")->value());
         self::$_stash_cheminfo[$casNO] = $row;
         return $row;
