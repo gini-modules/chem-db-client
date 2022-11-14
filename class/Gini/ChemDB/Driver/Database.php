@@ -70,7 +70,7 @@ class Database
         $qCasNOs = $db->quote($casNOs);
         $query = self::getDB()->query("select cas_no,group_concat(name) as names from chemical_type where cas_no in ({$qCasNOs}) group by cas_no");
         if (!$query) return [];
-        
+
         $rows = $query->rows();
         if (!count($rows)) return [];
 
@@ -98,7 +98,7 @@ class Database
         self::$_driver_handler = \Gini\IoC::construct('\Gini\ChemDB\Driver\Database');
         return self::$_driver_handler;
     }
-    
+
     private $_path = null;
     public function __get($name)
     {
@@ -218,14 +218,14 @@ class Database
             return self::_prepareSQLNoH($types, $keyword);
         } else {
             switch ($types) {
-            case 'all':
-                return self::_prepareSQLAll($keyword);
-            case 'all-haz':
-                return self::_prepareSQLAllHaz($keyword);
-            case 'normal':
-                return self::_prepareSQLNormal($keyword);
-            default:
-                return self::_prepareSQLHaz($types, $keyword);
+                case 'all':
+                    return self::_prepareSQLAll($keyword);
+                case 'all-haz':
+                    return self::_prepareSQLAllHaz($keyword);
+                case 'normal':
+                    return self::_prepareSQLNormal($keyword);
+                default:
+                    return self::_prepareSQLHaz($types, $keyword);
             }
         }
     }
@@ -242,6 +242,10 @@ class Database
     private static function _prepareSQLAll($keyword=null)
     {
         $keys = self::$_chemical_info_keys;
+        if ($keyword) {
+            $keys[] = "if(name ='{$keyword}',2,if(name like '{$keyword}%',1,0)) as score";
+        }
+
         $keysString = implode(',', $keys);
         $db = self::getDB();
         if (!is_null($keyword) || $keyword!=='') {
@@ -260,6 +264,7 @@ class Database
                     ':name'=> $db->quote("%{$keyword}%"),
                 ]);
             }
+            $sql .= " order by score desc";
         } else {
             $sql = "SELECT {$keysString} FROM chemical_info";
             $count = 'SELECT COUNT(*) FROM chemical_info';
@@ -271,6 +276,7 @@ class Database
     {
         $keys = self::$_chemical_info_keys;
         $keys = array_map(function($v) { return 'chemical.'.$v.' as '.$v; }, $keys);
+        $keys[] = "if(chemical.name ='{$keyword}',2,if(chemical.name like '{$keyword}%',1,0)) as score";
         $keysString = implode(',', $keys);
         $db = self::getDB();
         if (!is_null($keyword) || $keyword!=='') {
@@ -289,6 +295,7 @@ class Database
                     ':name'=> $db->quote("%{$keyword}%"),
                 ]);
             }
+            $sql .= " order by score desc";
         } else {
             $sql = 'SELECT {$keysString} FROM chemical_type LEFT JOIN chemical_info as chemical ON chemical_type.cas_no=chemical.cas_no group by chemical.cas_no';
             $count = 'SELECT COUNT(chemical.cas_no) FROM chemical_type LEFT JOIN chemical_info as chemical ON chemical_type.cas_no=chemical.cas_no group by chemical.cas_no';
@@ -300,6 +307,7 @@ class Database
     {
         $keys = self::$_chemical_info_keys;
         $keys = array_map(function($v) { return 'chemical.'.$v.' as '.$v; }, $keys);
+        $keys[] = "if(chemical.name ='{$keyword}',2,if(chemical.name like '{$keyword}%',1,0)) as score";
         $keysString = implode(',', $keys);
         $db = self::getDB();
         if (!is_null($keyword) || $keyword!=='') {
@@ -318,6 +326,7 @@ class Database
                     ':name'=> $db->quote("%{$keyword}%"),
                 ]);
             }
+            $sql .= " order by score desc";
         } else {
             $sql = 'SELECT {$keysString} FROM chemical_info as chemical LEFT JOIN chemical_type ON chemical_type.cas_no=chemical.cas_no where chemical_type.name is null group by chemical.cas_no';
             $count = 'SELECT COUNT(chemical.cas_no) FROM chemical_info as chemical LEFT JOIN chemical_type ON chemical_type.cas_no=chemical.cas_no where chemical_type.name is null group by chemical.cas_no';
@@ -329,6 +338,7 @@ class Database
     {
         $keys = self::$_chemical_info_keys;
         $keys = array_map(function($v) { return 'chemical.'.$v.' as '.$v; }, $keys);
+        $keys[] = "if(chemical.name ='{$keyword}',2,if(chemical.name like '{$keyword}%',1,0)) as score";
         $keysString = implode(',', $keys);
         $db = self::getDB();
         if (!is_null($keyword) || $keyword!=='') {
@@ -351,6 +361,7 @@ class Database
                     ':name'=> $db->quote("%{$keyword}%"),
                 ]);
             }
+            $sql .= " order by score desc";
         } else {
             $sql = strtr("SELECT {$keysString} FROM chemical_type LEFT JOIN chemical_info as chemical ON chemical_type.cas_no=chemical.cas_no WHERE chemical_type.name in (:types) group by chemical.cas_no", [
                 ':types'=> $db->quote($types),
@@ -369,6 +380,7 @@ class Database
         });
         $keys = self::$_chemical_info_keys;
         $keys = array_map(function($v) { return 'chemical.'.$v.' as '.$v; }, $keys);
+        $keys[] = "if(chemical.name ='{$keyword}',2,if(chemical.name like '{$keyword}%',1,0)) as score";
         $keysString = implode(',', $keys);
         $db = self::getDB();
         if (!is_null($keyword) || $keyword!=='') {
@@ -391,6 +403,7 @@ class Database
                     ':name'=> $db->quote("%{$keyword}%"),
                 ]);
             }
+            $sql .= " order by score desc";
         } else {
             $sql = strtr("SELECT {$keysString} FROM chemical_info as chemical LEFT JOIN chemical_type ON chemical_type.cas_no=chemical.cas_no WHERE (chemical_type.name in (:types) OR chemical_type.name is null) group by chemical.cas_no ", [
                 ':types'=> $db->quote($types),
@@ -404,5 +417,6 @@ class Database
 
     // 功能替代代码结束
 }
+
 
 
